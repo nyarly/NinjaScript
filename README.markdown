@@ -34,14 +34,14 @@ Nothing helps explain this like some examples.
         </script>
 
 That behavior block sets up three behaviors: 
-0. It converts a normal form (could be a POST, GET, whatever) into an AJAX submission.  By default, we'll put a "busy" overlay over the form until we get a response, and add any error messages to a list of error messages.  This behavior is packaged as $.ninja.ajax_submission
-0. It adds a decay behavior to messages, using jQuery effects.
-0. It applies a tooltip mouseover effect to elements with a "tooltip" class.  We elide the details of what that effect is for the purposes of example.
+1. It converts a normal form (could be a POST, GET, whatever) into an AJAX submission.  By default, we'll put a "busy" overlay over the form until we get a response, and add any error messages to a list of error messages.  This behavior is packaged as $.ninja.ajax_submission
+1. It adds a decay behavior to messages, using jQuery effects.
+1. It applies a tooltip mouseover effect to elements with a "tooltip" class.  We elide the details of what that effect is for the purposes of example.
 
 Notice that behaviors are defined in three different, intermixable styles:
-0. Prepackaged, in the form of a method on the Ninja object (available everywhere as $.ninja)
-0. With a "transform, events, helpers" syntax, which breaks out everything a behavior can do, completly explicitly.
-0. With an abbreviated events form, with the assumption that all we want to do is define a series of event handlers (and possibly a transformer)
+1. Prepackaged, in the form of a method on the Ninja object (available everywhere as $.ninja)
+1. With a "transform, events, helpers" syntax, which breaks out everything a behavior can do, completly explicitly.
+1. With an abbreviated events form, with the assumption that all we want to do is define a series of event handlers (and possibly a transformer)
 
 ## Anatomy of a Behavior
 
