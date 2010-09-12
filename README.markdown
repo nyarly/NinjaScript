@@ -56,5 +56,8 @@ NinjaScript applies "behaviors" to elements selected using jQuery's CSS-like sel
 
 NinjaScript is designed to be pretty easy to read, but a brief overview of how it works can aid in understanding.  
 
-Going to have to come later though.  I'm going out in about 15 minutes.
+Basically, NinjaScript is built around an event binding engine.  As nodes are added to the DOM that match the selectors provided, the transform functions are run and event handlers are attached to the nodes as appropriate.  
 
+We use DOM mutation events to do trigger the binding, which covers most of the browsers out there, as well as a homebrewed event that is raised explicitly for certain dopey browsers (the obvious one) by the NinjaScript machinery.  
+
+The upshot is that event handling is much more efficient than delegation, plus we get element transformation along with, so it's a win all around.
