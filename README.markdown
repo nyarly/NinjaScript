@@ -34,11 +34,13 @@ Nothing helps explain this like some examples.
         </script>
 
 That behavior block sets up three behaviors: 
+
 1. It converts a normal form (could be a POST, GET, whatever) into an AJAX submission.  By default, we'll put a "busy" overlay over the form until we get a response, and add any error messages to a list of error messages.  This behavior is packaged as $.ninja.ajax_submission
 1. It adds a decay behavior to messages, using jQuery effects.
 1. It applies a tooltip mouseover effect to elements with a "tooltip" class.  We elide the details of what that effect is for the purposes of example.
 
 Notice that behaviors are defined in three different, intermixable styles:
+
 1. Prepackaged, in the form of a method on the Ninja object (available everywhere as $.ninja)
 1. With a "transform, events, helpers" syntax, which breaks out everything a behavior can do, completly explicitly.
 1. With an abbreviated events form, with the assumption that all we want to do is define a series of event handlers (and possibly a transformer)
@@ -46,6 +48,7 @@ Notice that behaviors are defined in three different, intermixable styles:
 ## Anatomy of a Behavior
 
 NinjaScript applies "behaviors" to elements selected using jQuery's CSS-like selectors.  A behavior consists of two things: 
+
 0. A transformer: a function called "transform" that take the element as its argument, and changes it in ways that are appropriate to the behavior.  One prepackaged behavior "make_ajax_link" takes a form consisting of a single submit button and converts it into an anchor tag with appropriate attributes.
 0. A list of event handlers - functions in two arguments that take action based on the event and thelement.  By default, NinjaScript event handlers swallow the event, preventing the default behavior and preventing the event from bubbling back up the DOM.  You can use an array of [handler_function, *strings] to have NinjaScript allow "default" behavior, allow the event to "propagate", or allow the "immediate" propagation of the event (to other handlers on the same element).
 
