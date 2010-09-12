@@ -1,10 +1,10 @@
-== NinjaScript
+## NinjaScript
 NinjaScript is a jQuery library designed to allow unobstrusive scripting simply and easily.  Essentially, we use jQuery selectors to apply behavior the same way we use CSS stylesheets to apply stylings.  Additionally, NinjaScript makes it easy to package up useful behaviors and apply them quickly to disparate elements, or in different projects.
 
-== The Unobtrusive Ideal
+## The Unobtrusive Ideal
 Really, unobtrusive scripting is logical extension of the concept of Separation of Concerns.  We haven't put "style" attributes in our HTML since 1998, so why do we still use "onclick"?  Put all your behavior in one place, and you know where to look when you're trying to figure out why it doesn't work.  Plus, it makes it easier to build your site such that it'll work for those benighted souls who don't have Javascript enabled or available.  NinjaScript makes it reasonable to build a site that degrades gracefully.
 
-== Examples
+## Examples
 
 Nothing helps explain this like some examples.  
 
@@ -43,13 +43,13 @@ Notice that behaviors are defined in three different, intermixable styles:
 0. With a "transform, events, helpers" syntax, which breaks out everything a behavior can do, completly explicitly.
 0. With an abbreviated events form, with the assumption that all we want to do is define a series of event handlers (and possibly a transformer)
 
-== Anatomy of a Behavior
+## Anatomy of a Behavior
 
 NinjaScript applies "behaviors" to elements selected using jQuery's CSS-like selectors.  A behavior consists of two things: 
 0. A transformer: a function called "transform" that take the element as its argument, and changes it in ways that are appropriate to the behavior.  One prepackaged behavior "make_ajax_link" takes a form consisting of a single submit button and converts it into an anchor tag with appropriate attributes.
 0. A list of event handlers - functions in two arguments that take action based on the event and thelement.  By default, NinjaScript event handlers swallow the event, preventing the default behavior and preventing the event from bubbling back up the DOM.  You can use an array of [handler_function, *strings] to have NinjaScript allow "default" behavior, allow the event to "propagate", or allow the "immediate" propagation of the event (to other handlers on the same element).
 
-== Mechanics
+## Mechanics
 
 NinjaScript is designed to be pretty easy to read, but a brief overview of how it works can aid in understanding.  
 
