@@ -129,15 +129,20 @@
       }
     },
     handle_queue: function(){
-      //compacting the queue - should reduce overlapping like events to a single event.
       while (this.event_queue.length != 0){
-        this.event_queue = [this.event_queue[0]]
-        this.apply(this.event_queue.pop());
+        var target = this.event_queue.pop().target
+        var use_target = true
+        this.event_queue = this.event_queue.filter(function(val, idx, queue) {
+          use_target = use_target && !($.contains(val, target))
+          return !($.contains(target, val))
+        })
+        if(use_target){
+          this.apply(target);
+        }
       }
     },
-    apply: function(evnt){
+    apply: function(root){
       var i
-      var root = evnt.target
       var len = this.behaviors.length
       for(i = 0; i < len; i++) {
         var pair = this.behaviors[i]
