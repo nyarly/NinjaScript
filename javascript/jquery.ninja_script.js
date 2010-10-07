@@ -1,7 +1,9 @@
+// vim: sw=2
 (function($) {
   function Behavior(handlers) {
     this.helpers = {}
     this.event_handlers = []
+    this.use_live = Ninja.use_jquery_live
 
     if (typeof handlers.transform == "function") {
       this.transform = handlers.transform
@@ -10,6 +12,10 @@
     if (typeof handlers.helpers != "undefined"){
       this.helpers = handlers.helpers
       delete handlers.helpers
+    }
+    if (typeof handlers.use_live != "undefined"){
+      this.use_live = handlers.use_live
+      delete handlers.use_live
     }
 
     if (typeof handlers.events != "undefined") {
@@ -38,6 +44,8 @@
       this.element = elem
       this.handlers = []
 
+      // If this can make it's way to Behavior(instead of two deep) we
+      // can make huge mem savings
       for(var event_name in this.event_handlers) {
         var handler = this.event_handlers[event_name]
         this.handlers.push([event_name, this.make_handler(handler)])
@@ -196,14 +204,13 @@
     }
   }
 
-  //Needed: spinner, message blocks (There was a problem)
-  //Integrated with the ajax handler
   var Ninja = {
     config: {
       message_wrapping: function(text, classes) {
         return "<div class='flash " + classes +"'><p>" + text + "</p></div>"
       },
-      message_list: "#messages"
+      message_list: "#messages",
+      use_jquery_live: true
     },
     tools: {
       fire_mutation_event: function() {
@@ -225,6 +232,9 @@
         overlay.addClass("ninja busy")
         return overlay
       },
+
+      //Currently, this doesn't respect changes to the original block...
+      //Also certain elements (which ones are poorly understood) evade correct overlay
       build_overlay_for: function(elem) {
         var overlay = $(document.createElement("div"))
         var hideMe = $(elem)
@@ -242,6 +252,20 @@
         $(Ninja.config.message_list).append(adding_message)
       }
     },
+
+    //Stock behaviors
+    //Wishlist:
+    //  tooltip
+    //  watermarking
+    //  rounded corners
+    //  block drop shadow
+    //  text -> image
+    //  image redboxing
+    //  table sorting
+    //  decaying blocks (recoverable?)
+    //  dynamic validation?
+    //  autocomplete
+
     ajax_submission: function(configs) {
       if(typeof configs == "undefined") {
         configs = {}
@@ -291,83 +315,76 @@
           if ((images = $('input[type=image]', form)).size() > 0){
             image = images[0]
             link_text = "<img src='" + image.src + "' alt='" + image.alt +"'";
-          } else if((submits = $('input[type=submit]', form)).size() > 0) {
+          } 
+          else if((submits = $('input[type=submit]', form)).size() > 0) {
             submit = submits[0]
             link_text = submit.value
-            } else {
-              console.log("Couldn't find a submit input in form");
-            }
-
-            var link = $("<a href='#'>" + link_text + "</a>")
-            this.form_data = $(form).serializeArray()
-            this.action = form.action
-            this.method = form.method
-
-            $(form).replaceWith(link)
-            return link
-          },
-          events: {
-            click: function(evnt, elem){
-              var overlay = $.ninja.tools.busy_overlay(this.helpers.find_overlay(evnt.target))
-              var submitter = $.ninja.tools.ajax_submitter(
-                this.form_data, 
-                this.action, 
-                this.method)
-                submitter.on_response = function(x,t) {
-                  overlay.remove()
-                }
-                $("body").append(overlay)
-                submitter.submit()
-              }
-              }} 
-              )
-            }
+          } 
+          else {
+            console.log("Couldn't find a submit input in form");
           }
 
+          var link = $("<a href='#'>" + link_text + "</a>")
+          this.form_data = $(form).serializeArray()
+          this.action = form.action
+          this.method = form.method
 
-          function handleMutation(evnt) {
-            //TODO Queue up re-applications
-            //TODO Restrict application to changed part of subtree
-
-            $(this).data("ninja-behavior").event_triggered(evnt);
-          }
-
-          $.extend({
-            ninja: Ninja,
-            behavior: function(dispatching) 
-            {
-              var collection = new BehaviorCollection()
-              var selector
-              for(selector in dispatching) 
-              {
-                if(typeof dispatching[selector] == "undefined") 
-                {
-                  console.log("Selector " + selector + " not properly defined - ignoring")
-                } 
-                else 
-                {
-                  //Needs to confirm either a Behavior (or decended from Behavior (how?))
-                  //Or a proper behavior spec
-                  if(dispatching[selector] instanceof Behavior) 
-                  {
-                    collection.add_behavior(selector, dispatching[selector])
-                  } 
-                  else 
-                  {
-                    var behavior = new Behavior(dispatching[selector])
-                    collection.add_behavior(selector, behavior)
-                  }
-                }
-              }
-              $("html").data("ninja-behavior", collection);
-              $("html").bind("DOMSubtreeModified DOMNodeInserted NinjaChangedDOM", handleMutation);
-              $("html").one("DOMSubtreeModified DOMNodeInserted", function(){
-                Ninja.tools.fire_mutation_event = function(){}
-              })
-              //$(document.firstChild).data("ninja-behavior", collection);
-              //$(document.firstChild).bind("DOMSubtreeModified DOMNodeInserted NinjaChangedDOM", handleMutation);
-              //      collection.apply();
-              $(function(){ Ninja.tools.fire_mutation_event(); });
+          $(form).replaceWith(link)
+          return link
+        },
+        events: {
+          click: function(evnt, elem){
+            var overlay = $.ninja.tools.busy_overlay(this.helpers.find_overlay(evnt.target))
+            var submitter = $.ninja.tools.ajax_submitter( this.form_data, this.action, this.method)
+            submitter.on_response = function(x,t) {
+              overlay.remove()
             }
-          });
-        })(jQuery);
+            $("body").append(overlay)
+            submitter.submit()
+          }
+        }
+      })
+    }
+  }
+
+  function handleMutation(evnt) {
+    //TODO Queue up re-applications
+    //TODO Restrict application to changed part of subtree
+
+    $(this).data("ninja-behavior").event_triggered(evnt);
+  }
+
+  $.extend({
+    ninja: Ninja,
+    behavior: function(dispatching) 
+    {
+      var collection = new BehaviorCollection()
+      var selector
+      for(selector in dispatching) 
+      {
+        if(typeof dispatching[selector] == "undefined") 
+        {
+          console.log("Selector " + selector + " not properly defined - ignoring")
+        } 
+        else 
+        {
+          if(dispatching[selector] instanceof Behavior) 
+          {
+            collection.add_behavior(selector, dispatching[selector])
+          } 
+          else 
+          {
+            var behavior = new Behavior(dispatching[selector])
+            collection.add_behavior(selector, behavior)
+          }
+        }
+      }
+      $("html").data("ninja-behavior", collection);
+      $("html").bind("DOMSubtreeModified DOMNodeInserted NinjaChangedDOM", handleMutation);
+      $("html").one("DOMSubtreeModified DOMNodeInserted", function(){
+        Ninja.tools.fire_mutation_event = function(){}
+      })
+      $(function(){ Ninja.tools.fire_mutation_event(); });
+    }
+  });
+})(jQuery);
