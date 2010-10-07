@@ -26,8 +26,8 @@
     }
 
     var applier = function() {
-      this.apply = function() {
-        var elem = this.transform(this.element)
+      this.apply = function(element) {
+        var elem = this.transform(element)
 
         $(elem).data("ninja-behaviors", true)
         var len = this.handlers.length
@@ -36,12 +36,13 @@
           var handler = this.handlers[i][1]
           $(elem).bind(event_name, handler)
         }
+        delete this.handlers
       }
     }
     applier.prototype = this
 
     this.in_context = function(elem) {
-      this.element = elem
+      var element = elem
       this.handlers = []
 
       // If this can make it's way to Behavior(instead of two deep) we
@@ -61,7 +62,7 @@
   Behavior.prototype = {
     apply: function(elem) {
       if (!$(elem).data("ninja_behaviors")) {
-        new this.in_context(elem).apply()
+        new this.in_context(elem).apply(elem)
       }
     },
     make_handler: function(config) {
@@ -131,18 +132,18 @@
       //compacting the queue - should reduce overlapping like events to a single event.
       while (this.event_queue.length != 0){
         this.event_queue = [this.event_queue[0]]
-        this.apply();
-        this.event_queue.pop()
+        this.apply(this.event_queue.pop());
       }
     },
-    apply: function(){
+    apply: function(evnt){
       var i
+      var root = evnt.target
       var len = this.behaviors.length
       for(i = 0; i < len; i++) {
         var pair = this.behaviors[i]
         var selector = pair[0]
         var behavior = pair[1]
-        $(selector).each( function(index, elem){
+        $(root).find(selector).each( function(index, elem){
           if (!$(elem).data("ninja_behaviors")) {
             behavior.apply(elem)
           }
